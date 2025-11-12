@@ -11,9 +11,13 @@ let package = Package(
             targets: ["HamerKit"]
         ),
     ],
+    dependencies: [
+        .package(url: "https://github.com/scinfu/SwiftSoup.git", .upToNextMajor(from: "2.10.1")),
+    ],
     targets: [
         .target(
-            name: "HamerKit"
+            name: "HamerKit",
+            dependencies: ["SwiftSoup"]
         ),
         .testTarget(
             name: "HamerKitTests",
