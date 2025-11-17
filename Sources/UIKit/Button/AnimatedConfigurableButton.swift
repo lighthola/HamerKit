@@ -1,6 +1,15 @@
 import UIKit
 
 public extension AnimatedConfigurableButton {
+    static var underlineButton: AnimatedConfigurableButton {
+        AnimatedConfigurableButton()
+            .isUnderlineEnabled(true)
+            .background(.color(.clear))
+            .edgeInsets(.zero)
+    }
+}
+
+public extension AnimatedConfigurableButton {
     enum ButtonState {
         case normal, highlighted, selected, disabled, selectHighlighted
     }
