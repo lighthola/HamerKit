@@ -1,11 +1,25 @@
 import UIKit
 
 public extension AnimatedConfigurableButton {
-    static var underlineButton: AnimatedConfigurableButton {
+    static var clearButton: AnimatedConfigurableButton {
         AnimatedConfigurableButton()
-            .isUnderlineEnabled(true)
-            .background(.color(.clear))
+            .title("")
+            .background(.clear)
             .edgeInsets(.zero)
+            .cornerStyle(.fixed)
+            .cornerRadius(0)
+    }
+    
+    static var toggleButton: AnimatedConfigurableButton {
+        AnimatedConfigurableButton
+            .clearButton
+            .changesSelectionAsPrimaryAction(true)
+    }
+    
+    static var underlineButton: AnimatedConfigurableButton {
+        AnimatedConfigurableButton
+            .clearButton
+            .isUnderlineEnabled(true)
     }
 }
 
@@ -20,6 +34,7 @@ public extension AnimatedConfigurableButton {
                       start: CGPoint = .zero,
                       end: CGPoint = .init(x: 1, y: 0),
                       locations: [NSNumber] = [0, 1])
+        case clear
     }
     
     enum EdgeInset {
@@ -298,6 +313,8 @@ public final class AnimatedConfigurableButton: UIButton {
             case .gradient(let colors, let start, let end, let locations):
                 let faded = colors.map { adjustedColor(from: $0, for: state) }
                 return ButtonColor.gradient(faded, start: start, end: end, locations: locations) as? T
+            case .clear:
+                return ButtonColor.color(.clear) as? T
             }
         }
         
@@ -381,10 +398,13 @@ public final class AnimatedConfigurableButton: UIButton {
                     gradientLayer.colors = []
                     config.background.backgroundColor = colors.first ?? .clear
                 }
+            case .clear:
+                gradientLayer.colors = []
+                config.background.backgroundColor = .clear
             }
         } else {
-            config.background.backgroundColor = nil
             gradientLayer.colors = []
+            config.background.backgroundColor = .clear
         }
         
         config.titleTextAttributesTransformer = UIConfigurationTextAttributesTransformer { [weak self] incoming in
