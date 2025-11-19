@@ -12,6 +12,16 @@ public extension UIColor {
 }
 
 public extension UIColor {
+    static func rgb(_  r: Int, _ g: Int, _ b: Int, _ a: CGFloat = 1) -> UIColor {
+        let red = CGFloat(r).clampedNormalized(to: 0...255)
+        let green = CGFloat(g).clampedNormalized(to: 0...255)
+        let blue = CGFloat(b).clampedNormalized(to: 0...255)
+        let alpha = a.clamped(to: 0...1)
+        return UIColor(red: red, green: green, blue: blue, alpha: alpha)
+    }
+}
+
+public extension UIColor {
     /// Creates a color from a 6-digit or 8-digit hex string (the latter includes alpha).
     /// Supports hex string with or without "#".
     static func hex(_ hex: String) -> UIColor {
