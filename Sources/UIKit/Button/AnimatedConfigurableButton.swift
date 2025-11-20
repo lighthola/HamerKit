@@ -197,91 +197,6 @@ public final class AnimatedConfigurableButton: UIButton {
         updateConfiguration(for: state, animated: false)
     }
     
-    // MARK: - DSL Builder
-    
-    @discardableResult public func title(_ text: String, for state: ButtonState = .normal) -> Self {
-        setTitle(text, for: state); return self
-    }
-    
-    @discardableResult public func titleColor(_ color: UIColor?, for state: ButtonState = .normal) -> Self {
-        setTitleColor(color, for: state); return self
-    }
-    
-    @discardableResult public func background(_ color: ButtonColor?, for state: ButtonState = .normal) -> Self {
-        setBackgroundColor(color, for: state); return self
-    }
-    
-    @discardableResult public func font(_ font: UIFont, for state: ButtonState = .normal) -> Self {
-        setFont(font, for: state); return self
-    }
-    
-    @discardableResult public func isUnderlineEnabled(_ enabled: Bool, for state: ButtonState = .normal) -> Self {
-        setUnderlineEnabled(enabled, for: state); return self
-    }
-    
-    @discardableResult public func image(_ image: UIImage?, for state: ButtonState = .normal) -> Self {
-        setImage(image, for: state); return self
-    }
-    
-    @discardableResult public func imagePadding(_ padding: CGFloat, for state: ButtonState = .normal) -> Self {
-        setImagePadding(padding, for: state); return self
-    }
-    
-    @discardableResult public func imagePlacement(_ placement: NSDirectionalRectEdge, for state: ButtonState = .normal) -> Self {
-        setImagePlacement(placement, for: state); return self
-    }
-    
-    @discardableResult public func border(color: UIColor?, width: CGFloat, for state: ButtonState = .normal) -> Self {
-        setBorderColor(color, for: state)
-        setBorderWidth(width, for: state)
-        return self
-    }
-    
-    @discardableResult public func cornerStyle(_ style: UIButton.Configuration.CornerStyle, for state: ButtonState = .normal) -> Self {
-        setCornerStyle(style, for: state); return self
-    }
-    
-    @discardableResult public func cornerRadius(_ radius: CGFloat, for state: ButtonState = .normal) -> Self {
-        setCornerRadius(radius, for: state); return self
-    }
-    
-    @discardableResult public func edgeInsets(_ insets: [EdgeInset], for state: ButtonState = .normal) -> Self {
-        setEdgeInsets(insets, for: state); return self
-    }
-    
-    @discardableResult public func edgeInsets(_ edgeInsets: NSDirectionalEdgeInsets, for state: ButtonState = .normal) -> Self {
-        setEdgeInsets(edgeInsets, for: state); return self
-    }
-    
-    @discardableResult public func colorAdjustments(_ adjustments: [ColorAdjustment], for state: ButtonState) -> Self {
-        guard state != .normal else { return self }
-        setColorAdjustments(adjustments, for: state); return self
-    }
-    
-    @discardableResult public func colorAdjustmentEnabled(_ enabled: Bool) -> Self {
-        isColorAdjustmentEnabled = enabled; return self
-    }
-    
-    @discardableResult public func animated(_ enabled: Bool) -> Self {
-        isAnimationEnabled = enabled; return self
-    }
-    
-    @discardableResult public func animationDuration(_ duration: TimeInterval) -> Self {
-        animationDuration = duration; return self
-    }
-    
-    @discardableResult public func isEnabled(_ enabled: Bool) -> Self {
-        isEnabled = enabled; return self
-    }
-    
-    @discardableResult public func isSelected(_ selected: Bool) -> Self {
-        isSelected = selected; return self
-    }
-    
-    @discardableResult public func changesSelectionAsPrimaryAction(_ enabled: Bool) -> Self {
-        changesSelectionAsPrimaryAction = enabled; return self
-    }
-    
     // MARK: - Internal config logic
     
     private func resolvedValue<T>(for dict: [ButtonState: T]) -> T? {
@@ -440,6 +355,109 @@ public final class AnimatedConfigurableButton: UIButton {
         guard state == self.buttonState else { return }
         
         applyConfiguration(to: self, animated: animated)
+    }
+}
+
+// MARK: - DSL Builder
+
+public extension AnimatedConfigurableButton {
+    @discardableResult func title(_ text: String, for state: ButtonState = .normal) -> Self {
+        setTitle(text, for: state); return self
+    }
+    
+    @discardableResult func titleColor(_ color: UIColor?, for state: ButtonState = .normal) -> Self {
+        setTitleColor(color, for: state); return self
+    }
+    
+    @discardableResult func background(_ color: ButtonColor?, for state: ButtonState = .normal) -> Self {
+        setBackgroundColor(color, for: state); return self
+    }
+    
+    @discardableResult func font(_ font: UIFont, for state: ButtonState = .normal) -> Self {
+        setFont(font, for: state); return self
+    }
+    
+    @discardableResult func isUnderlineEnabled(_ enabled: Bool, for state: ButtonState = .normal) -> Self {
+        setUnderlineEnabled(enabled, for: state); return self
+    }
+    
+    @discardableResult func image(_ image: UIImage?, for state: ButtonState = .normal) -> Self {
+        setImage(image, for: state); return self
+    }
+    
+    @discardableResult func imagePadding(_ padding: CGFloat, for state: ButtonState = .normal) -> Self {
+        setImagePadding(padding, for: state); return self
+    }
+    
+    @discardableResult func imagePlacement(_ placement: NSDirectionalRectEdge, for state: ButtonState = .normal) -> Self {
+        setImagePlacement(placement, for: state); return self
+    }
+    
+    @discardableResult func border(color: UIColor?, width: CGFloat, for state: ButtonState = .normal) -> Self {
+        setBorderColor(color, for: state)
+        setBorderWidth(width, for: state)
+        return self
+    }
+    
+    @discardableResult func cornerStyle(_ style: UIButton.Configuration.CornerStyle, for state: ButtonState = .normal) -> Self {
+        setCornerStyle(style, for: state); return self
+    }
+    
+    @objc @discardableResult override func cornerRadius(_ radius: CGFloat) -> Self {
+        setCornerRadius(radius, for: .normal); return self
+    }
+    
+    @discardableResult func cornerRadius(_ radius: CGFloat, for state: ButtonState = .normal) -> Self {
+        setCornerRadius(radius, for: state); return self
+    }
+    
+    @discardableResult func edgeInsets(_ insets: [EdgeInset], for state: ButtonState = .normal) -> Self {
+        setEdgeInsets(insets, for: state); return self
+    }
+    
+    @discardableResult func edgeInsets(_ edgeInsets: NSDirectionalEdgeInsets, for state: ButtonState = .normal) -> Self {
+        setEdgeInsets(edgeInsets, for: state); return self
+    }
+    
+    @discardableResult func colorAdjustments(_ adjustments: [ColorAdjustment], for state: ButtonState) -> Self {
+        guard state != .normal else { return self }
+        setColorAdjustments(adjustments, for: state); return self
+    }
+    
+    @discardableResult func colorAdjustmentEnabled(_ enabled: Bool) -> Self {
+        isColorAdjustmentEnabled = enabled; return self
+    }
+    
+    @discardableResult func animated(_ enabled: Bool) -> Self {
+        isAnimationEnabled = enabled; return self
+    }
+    
+    @discardableResult func animationDuration(_ duration: TimeInterval) -> Self {
+        animationDuration = duration; return self
+    }
+    
+    @discardableResult func isEnabled(_ enabled: Bool) -> Self {
+        isEnabled = enabled; return self
+    }
+    
+    @discardableResult func isSelected(_ selected: Bool) -> Self {
+        isSelected = selected; return self
+    }
+    
+    @discardableResult func changesSelectionAsPrimaryAction(_ enabled: Bool) -> Self {
+        changesSelectionAsPrimaryAction = enabled; return self
+    }
+    
+    @discardableResult func onTap(_ target: Any?, action: Selector) -> Self {
+        addTarget(target, action: action, for: .touchUpInside); return self
+    }
+    
+    @discardableResult func onPress(_ target: Any?, action: Selector) -> Self {
+        addTarget(target, action: action, for: .touchDown); return self
+    }
+    
+    @discardableResult func onCancel(_ target: Any?, action: Selector) -> Self {
+        addTarget(target, action: action, for: [.touchUpOutside, .touchCancel]); return self
     }
 }
 
