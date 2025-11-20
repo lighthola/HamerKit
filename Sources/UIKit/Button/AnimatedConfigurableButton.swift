@@ -120,6 +120,13 @@ public final class AnimatedConfigurableButton: UIButton {
     
     required init?(coder: NSCoder) { fatalError() }
     
+    // MARK: Lifecycle
+    
+    public override func layoutSubviews() {
+        super.layoutSubviews()
+        adjustGradientLayerIfNeeded(for: configuration)
+    }
+    
     // MARK: - Public
     
     public func setTitle(_ title: String?, for state: ButtonState) {
@@ -300,25 +307,27 @@ public final class AnimatedConfigurableButton: UIButton {
         if let bgColor = resolvedValue(for: backgroundColorByState) {
             switch bgColor {
             case .color(let color):
-                gradientLayer.colors = []
+                resetGradientLayer()
                 config.background.backgroundColor = color
             case .gradient(let colors, let start, let end, let locations):
                 if colors.count > 1 {
-                    gradientLayer.colors = colors.map(\.cgColor)
-                    gradientLayer.startPoint = start
-                    gradientLayer.endPoint = end
-                    gradientLayer.locations = locations
+                    gradientLayer
+                        .colors(colors.map(\.cgColor))
+                        .startPoint(start)
+                        .endPoint(end)
+                        .locations(locations)
+                    adjustGradientLayerIfNeeded(for: config)
                     config.background.backgroundColor = .clear
                 } else {
-                    gradientLayer.colors = []
+                    resetGradientLayer()
                     config.background.backgroundColor = colors.first ?? .clear
                 }
             case .clear:
-                gradientLayer.colors = []
+                resetGradientLayer()
                 config.background.backgroundColor = .clear
             }
         } else {
-            gradientLayer.colors = []
+            resetGradientLayer()
             config.background.backgroundColor = .clear
         }
         
@@ -355,6 +364,24 @@ public final class AnimatedConfigurableButton: UIButton {
         guard state == self.buttonState else { return }
         
         applyConfiguration(to: self, animated: animated)
+    }
+    
+    private func adjustGradientLayerIfNeeded(for config: UIButton.Configuration?) {
+        guard #unavailable(iOS 26), let config else { return }
+        
+        if config.cornerStyle == .capsule {
+            gradientLayer.cornerRadius = bounds.height / 2
+        } else {
+            gradientLayer.cornerRadius = config.background.cornerRadius
+        }
+    }
+    
+    private func resetGradientLayer() {
+        gradientLayer.colors = []
+        
+        if #unavailable(iOS 26) {
+            gradientLayer.cornerRadius = 0
+        }
     }
 }
 
