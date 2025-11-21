@@ -24,25 +24,6 @@ public extension AnimatedConfigurableButton {
 }
 
 public extension AnimatedConfigurableButton {
-    enum ButtonState {
-        case normal, highlighted, selected, disabled, selectHighlighted
-    }
-    
-    enum ButtonColor {
-        case color(UIColor)
-        case gradient([UIColor],
-                      start: CGPoint = .zero,
-                      end: CGPoint = .init(x: 1, y: 0),
-                      locations: [NSNumber] = [0, 1])
-        case clear
-    }
-    
-    enum EdgeInset {
-        case top(CGFloat), leading(CGFloat), bottom(CGFloat), trailing(CGFloat)
-        case horizontal(CGFloat), vertical(CGFloat)
-        case all(CGFloat)
-    }
-    
     enum ColorAdjustment {
         case alpha(CGFloat)        // 改變透明度
         case brighten(CGFloat)     // 提亮
@@ -52,21 +33,11 @@ public extension AnimatedConfigurableButton {
 }
 
 public final class AnimatedConfigurableButton: UIButton {
-    // MARK: - State storage
+    public typealias ButtonState = ButtonStateConfiguration.ButtonState
+    public typealias ButtonColor = ButtonStateConfiguration.ButtonColor
+    public typealias EdgeInset = ButtonStateConfiguration.EdgeInset
     
-    private var titleByState: [ButtonState: String] = [:]
-    private var titleColorByState: [ButtonState: UIColor] = [:]
-    private var underlineStyleByState: [ButtonState: NSUnderlineStyle] = [:]
-    private var backgroundColorByState: [ButtonState: ButtonColor] = [:]
-    private var fontByState: [ButtonState: UIFont] = [:]
-    private var imageByState: [ButtonState: UIImage] = [:]
-    private var imagePaddingByState: [ButtonState: CGFloat] = [:]
-    private var imagePlacementByState: [ButtonState: NSDirectionalRectEdge] = [:]
-    private var borderColorByState: [ButtonState: UIColor] = [:]
-    private var borderWidthByState: [ButtonState: CGFloat] = [:]
-    private var cornerStyleByState: [ButtonState: UIButton.Configuration.CornerStyle] = [:]
-    private var cornerRadiusByState: [ButtonState: CGFloat] = [:]
-    private var edgeInsetsByState: [ButtonState: [EdgeInset]] = [:]
+    public var stateConfiguration: ButtonStateConfiguration = .init()
     
     public private(set) var colorAdjustmentsByState: [ButtonState: [ColorAdjustment]] = [
         .highlighted: [.darken(0.05)],
@@ -89,33 +60,17 @@ public final class AnimatedConfigurableButton: UIButton {
     public init(_ configuration: UIButton.Configuration = .filled()) {
         super.init(frame: .zero)
         self.configuration = configuration
+        applyStateConfiguration(ButtonStateConfiguration(configuration))
         
         configurationUpdateHandler = { [weak self] button in
             guard let self else { return }
             applyConfiguration(to: button, animated: isAnimationEnabled)
         }
-        
-        applyInitialConfiguration(configuration)
     }
     
-    private func applyInitialConfiguration(_ config: UIButton.Configuration) {
-        title(config.title ?? "Button")
-        titleColor(config.baseForegroundColor ?? .white)
-        background(.color(config.baseBackgroundColor ?? .systemBlue))
-        font(config.attributedTitle?.font ?? .systemFont(ofSize: 17))
-        if let _ = config.attributedTitle?.underlineStyle?.rawValue {
-            isUnderlineEnabled(true)
-        }
-        image(config.image)
-        imagePadding(config.imagePadding)
-        imagePlacement(config.imagePlacement)
-        if config.background.strokeColor != .clear {
-            border(color: config.background.strokeColor ,
-                   width: config.background.strokeWidth)
-        }
-        cornerStyle(config.cornerStyle)
-        cornerRadius(config.background.cornerRadius)
-        edgeInsets(config.contentInsets)
+    public convenience init(_ configuration: ButtonStateConfiguration) {
+        self.init(.filled())
+        applyStateConfiguration(configuration)
     }
     
     required init?(coder: NSCoder) { fatalError() }
@@ -129,79 +84,84 @@ public final class AnimatedConfigurableButton: UIButton {
     
     // MARK: - Public
     
+    public func applyStateConfiguration(_ config: ButtonStateConfiguration? = nil) {
+        if let config { stateConfiguration = config }
+        applyConfiguration(to: self, animated: false)
+    }
+    
     public func setTitle(_ title: String?, for state: ButtonState) {
-        titleByState[state] = title
-        updateConfiguration(for: state, animated: false)
+        stateConfiguration.title[state] = title
+        applyConfiguration(to: self, animated: false)
     }
     
     public func setTitleColor(_ color: UIColor?, for state: ButtonState) {
-        titleColorByState[state] = color
-        updateConfiguration(for: state, animated: false)
+        stateConfiguration.titleColor[state] = color
+        applyConfiguration(to: self, animated: false)
     }
     
     public func setBackgroundColor(_ color: ButtonColor?, for state: ButtonState) {
-        backgroundColorByState[state] = color
-        updateConfiguration(for: state, animated: false)
+        stateConfiguration.backgroundColor[state] = color
+        applyConfiguration(to: self, animated: false)
     }
     
     public func setFont(_ font: UIFont?, for state: ButtonState) {
-        fontByState[state] = font
-        updateConfiguration(for: state, animated: false)
+        stateConfiguration.font[state] = font
+        applyConfiguration(to: self, animated: false)
     }
     
     public func setUnderlineEnabled(_ enabled: Bool, for state: ButtonState) {
-        underlineStyleByState[state] = enabled ? .single : nil
-        updateConfiguration(for: state, animated: false)
+        stateConfiguration.underlineStyle[state] = enabled ? .single : nil
+        applyConfiguration(to: self, animated: false)
     }
     
     public func setImage(_ image: UIImage?, for state: ButtonState) {
-        imageByState[state] = image
-        updateConfiguration(for: state, animated: false)
+        stateConfiguration.image[state] = image
+        applyConfiguration(to: self, animated: false)
     }
     
     public func setImagePadding(_ padding: CGFloat, for state: ButtonState) {
-        imagePaddingByState[state] = padding
-        updateConfiguration(for: state, animated: false)
+        stateConfiguration.imagePadding[state] = padding
+        applyConfiguration(to: self, animated: false)
     }
     
     public func setImagePlacement(_ placement: NSDirectionalRectEdge, for state: ButtonState) {
-        imagePlacementByState[state] = placement
-        updateConfiguration(for: state, animated: false)
+        stateConfiguration.imagePlacement[state] = placement
+        applyConfiguration(to: self, animated: false)
     }
     
     public func setBorderColor(_ color: UIColor?, for state: ButtonState) {
-        borderColorByState[state] = color
-        updateConfiguration(for: state, animated: false)
+        stateConfiguration.borderColor[state] = color
+        applyConfiguration(to: self, animated: false)
     }
     
     public func setBorderWidth(_ width: CGFloat, for state: ButtonState) {
-        borderWidthByState[state] = width
-        updateConfiguration(for: state, animated: false)
+        stateConfiguration.borderWidth[state] = width
+        applyConfiguration(to: self, animated: false)
     }
     
     public func setCornerStyle(_ style: UIButton.Configuration.CornerStyle, for state: ButtonState) {
-        cornerStyleByState[state] = style
-        updateConfiguration(for: state, animated: false)
+        stateConfiguration.cornerStyle[state] = style
+        applyConfiguration(to: self, animated: false)
     }
     
     public func setCornerRadius(_ radius: CGFloat, for state: ButtonState) {
-        cornerRadiusByState[state] = radius
-        updateConfiguration(for: state, animated: false)
+        stateConfiguration.cornerRadius[state] = radius
+        applyConfiguration(to: self, animated: false)
     }
     
     public func setEdgeInsets(_ insets: [EdgeInset], for state: ButtonState) {
-        edgeInsetsByState[state] = insets
-        updateConfiguration(for: state, animated: false)
+        stateConfiguration.edgeInsets[state] = insets
+        applyConfiguration(to: self, animated: false)
     }
     
     public func setEdgeInsets(_ edgeInsets: NSDirectionalEdgeInsets, for state: ButtonState) {
-        edgeInsetsByState[state] = edgeInsets.toButtonEdgeInsets()
-        updateConfiguration(for: state, animated: false)
+        stateConfiguration.edgeInsets[state] = edgeInsets.toButtonEdgeInsets()
+        applyConfiguration(to: self, animated: false)
     }
     
     public func setColorAdjustments(_ adjustments: [ColorAdjustment], for state: ButtonState) {
         colorAdjustmentsByState[state] = adjustments
-        updateConfiguration(for: state, animated: false)
+        applyConfiguration(to: self, animated: false)
     }
     
     // MARK: - Internal config logic
@@ -267,18 +227,18 @@ public final class AnimatedConfigurableButton: UIButton {
     private func applyConfiguration(to button: UIButton, animated: Bool) {
         guard var config = button.configuration else { return }
         
-        config.title = resolvedValue(for: titleByState)
-        config.baseForegroundColor = resolvedValue(for: titleColorByState)
-        config.image = resolvedValue(for: imageByState)
-        config.imagePadding = resolvedValue(for: imagePaddingByState) ?? 0
-        config.imagePlacement = resolvedValue(for: imagePlacementByState) ?? .leading
-        config.background.strokeColor = resolvedValue(for: borderColorByState)
-        config.background.strokeWidth = resolvedValue(for: borderWidthByState) ?? 0
-        config.cornerStyle = resolvedValue(for: cornerStyleByState) ?? .dynamic
-        config.background.cornerRadius = resolvedValue(for: cornerRadiusByState) ?? 0
+        config.title = resolvedValue(for: stateConfiguration.title)
+        config.baseForegroundColor = resolvedValue(for: stateConfiguration.titleColor)
+        config.image = resolvedValue(for: stateConfiguration.image)
+        config.imagePadding = resolvedValue(for: stateConfiguration.imagePadding) ?? 0
+        config.imagePlacement = resolvedValue(for: stateConfiguration.imagePlacement) ?? .leading
+        config.background.strokeColor = resolvedValue(for: stateConfiguration.borderColor)
+        config.background.strokeWidth = resolvedValue(for: stateConfiguration.borderWidth) ?? 0
+        config.cornerStyle = resolvedValue(for: stateConfiguration.cornerStyle) ?? .dynamic
+        config.background.cornerRadius = resolvedValue(for: stateConfiguration.cornerRadius) ?? 0
         
         config.setDefaultContentInsets()
-        if let insets = resolvedValue(for: edgeInsetsByState) {
+        if let insets = resolvedValue(for: stateConfiguration.edgeInsets) {
             for inset in insets {
                 switch inset {
                 case .top(let value):
@@ -304,7 +264,7 @@ public final class AnimatedConfigurableButton: UIButton {
             }
         }
         
-        if let bgColor = resolvedValue(for: backgroundColorByState) {
+        if let bgColor = resolvedValue(for: stateConfiguration.backgroundColor) {
             switch bgColor {
             case .color(let color):
                 resetGradientLayer()
@@ -336,9 +296,9 @@ public final class AnimatedConfigurableButton: UIButton {
             
             var container = incoming
             
-            container.font = resolvedValue(for: fontByState)
-            container.underlineStyle = resolvedValue(for: underlineStyleByState)
-
+            container.font = resolvedValue(for: stateConfiguration.font)
+            container.underlineStyle = resolvedValue(for: stateConfiguration.underlineStyle)
+            
             // Fix the title color for the disabled state.
             container.foregroundColor = config.baseForegroundColor
             
@@ -358,12 +318,6 @@ public final class AnimatedConfigurableButton: UIButton {
         } else {
             updates()
         }
-    }
-    
-    private func updateConfiguration(for state: ButtonState, animated: Bool) {
-        guard state == self.buttonState else { return }
-        
-        applyConfiguration(to: self, animated: animated)
     }
     
     private func adjustGradientLayerIfNeeded(for config: UIButton.Configuration?) {
@@ -388,6 +342,10 @@ public final class AnimatedConfigurableButton: UIButton {
 // MARK: - DSL Builder
 
 public extension AnimatedConfigurableButton {
+    @discardableResult func stateConfiguration(_ config: ButtonStateConfiguration) -> Self {
+        applyStateConfiguration(config); return self
+    }
+    
     @discardableResult func title(_ text: String, for state: ButtonState = .normal) -> Self {
         setTitle(text, for: state); return self
     }
@@ -462,36 +420,11 @@ public extension AnimatedConfigurableButton {
     @discardableResult func animationDuration(_ duration: TimeInterval) -> Self {
         animationDuration = duration; return self
     }
-    
-    @discardableResult func isEnabled(_ enabled: Bool) -> Self {
-        isEnabled = enabled; return self
-    }
-    
-    @discardableResult func isSelected(_ selected: Bool) -> Self {
-        isSelected = selected; return self
-    }
-    
-    @discardableResult func changesSelectionAsPrimaryAction(_ enabled: Bool) -> Self {
-        changesSelectionAsPrimaryAction = enabled; return self
-    }
-    
-    @discardableResult func onTap(_ target: Any?, action: Selector) -> Self {
-        addTarget(target, action: action, for: .touchUpInside); return self
-    }
-    
-    @discardableResult func onPress(_ target: Any?, action: Selector) -> Self {
-        addTarget(target, action: action, for: .touchDown); return self
-    }
-    
-    @discardableResult func onCancel(_ target: Any?, action: Selector) -> Self {
-        addTarget(target, action: action, for: [.touchUpOutside, .touchCancel]); return self
-    }
 }
 
 // MARK: - Helper
 
 fileprivate extension UIControl.State {
-    
     func toButtonState() -> AnimatedConfigurableButton.ButtonState {
         if contains(.disabled) {
             .disabled
@@ -507,15 +440,7 @@ fileprivate extension UIControl.State {
     }
 }
 
-fileprivate extension NSDirectionalEdgeInsets {
-    
-    func toButtonEdgeInsets() -> [AnimatedConfigurableButton.EdgeInset] {
-        [.top(top), .leading(leading), .bottom(bottom), .trailing(trailing)]
-    }
-}
-
 fileprivate extension UIColor {
-    
     func adjustBrightness(by amount: CGFloat) -> UIColor {
         var h: CGFloat = 0, s: CGFloat = 0, b: CGFloat = 0, a: CGFloat = 0
         guard getHue(&h, saturation: &s, brightness: &b, alpha: &a) else { return self }
