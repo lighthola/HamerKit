@@ -59,13 +59,7 @@ public final class AnimatedConfigurableButton: UIButton {
     
     public init(_ configuration: UIButton.Configuration = .filled()) {
         super.init(frame: .zero)
-        self.configuration = configuration
-        applyStateConfiguration(ButtonStateConfiguration(configuration))
-        
-        configurationUpdateHandler = { [weak self] button in
-            guard let self else { return }
-            applyConfiguration(to: button, animated: isAnimationEnabled)
-        }
+        applyInitialConfiguration(configuration)
     }
     
     public convenience init(_ configuration: ButtonStateConfiguration) {
@@ -73,7 +67,20 @@ public final class AnimatedConfigurableButton: UIButton {
         applyStateConfiguration(configuration)
     }
     
-    required init?(coder: NSCoder) { fatalError() }
+    required init?(coder: NSCoder) {
+        super.init(coder: coder)
+        applyInitialConfiguration(.filled())
+    }
+    
+    private func applyInitialConfiguration(_ config: UIButton.Configuration) {
+        self.configuration = config
+        applyStateConfiguration(ButtonStateConfiguration(config))
+        
+        configurationUpdateHandler = { [weak self] button in
+            guard let self else { return }
+            applyConfiguration(to: button, animated: isAnimationEnabled)
+        }
+    }
     
     // MARK: Lifecycle
     
