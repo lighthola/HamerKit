@@ -189,14 +189,14 @@ public extension UIView {
     }
     
     @discardableResult
-    func mLay(pin: OptionalEdge, to view: UIView? = nil, file: String = #file, line: Int = #line) -> [NSLayoutConstraint] {
+    func mLay(pin: OptionalEdge, to view: UIView? = nil, priority: UILayoutPriority = .required, file: String = #file, line: Int = #line) -> [NSLayoutConstraint] {
         assert(view != nil || superview != nil, "can't add Constraint to nil , superview and parameter view is nil")
         var arr: [NSLayoutConstraint] = []
         let view: UIView = view ?? superview!
-        if let top: CGFloat = pin.top { arr.append(mLay(.top, .equal, view, constant: top, file: file, line: line)) }
-        if let leading: CGFloat = pin.leading { arr.append(mLay(.leading, .equal, view, constant: leading, file: file, line: line)) }
-        if let bottom: CGFloat = pin.bottom { arr.append(mLay(.bottom, .equal, view, constant: -bottom, file: file, line: line)) }
-        if let trailing: CGFloat = pin.trailing { arr.append(mLay(.trailing, .equal, view, constant: -trailing, file: file, line: line)) }
+        if let top: CGFloat = pin.top { arr.append(mLay(.top, .equal, view, constant: top, priority: priority, file: file, line: line)) }
+        if let leading: CGFloat = pin.leading { arr.append(mLay(.leading, .equal, view, constant: leading, priority: priority, file: file, line: line)) }
+        if let bottom: CGFloat = pin.bottom { arr.append(mLay(.bottom, .equal, view, constant: -bottom, priority: priority, file: file, line: line)) }
+        if let trailing: CGFloat = pin.trailing { arr.append(mLay(.trailing, .equal, view, constant: -trailing, priority: priority, file: file, line: line)) }
         return arr
     }
     
@@ -348,14 +348,14 @@ public extension UIView {
     }
     
     @discardableResult
-    func mLaySafe(pin: OptionalEdge, to view: UIView? = nil, file: String = #file, line: Int = #line) -> [NSLayoutConstraint] {
+    func mLaySafe(pin: OptionalEdge, to view: UIView? = nil, priority: UILayoutPriority = .required, file: String = #file, line: Int = #line) -> [NSLayoutConstraint] {
         assert(view != nil || superview != nil, "can't add Constraint to nil , superview and parameter view is nil")
         var arr: [NSLayoutConstraint] = []
         let view: UIView = view ?? superview!
-        if let value: CGFloat = pin.top { arr.append(mLaySafe(.top, .equal, view, constant: value, file: file, line: line)) }
-        if let value: CGFloat = pin.leading { arr.append(mLaySafe(.leading, .equal, view, constant: value, file: file, line: line)) }
-        if let value: CGFloat = pin.bottom { arr.append(mLaySafe(.bottom, .equal, view, constant: -value, file: file, line: line)) }
-        if let value: CGFloat = pin.trailing { arr.append(mLaySafe(.trailing, .equal, view, constant: -value, file: file, line: line)) }
+        if let value: CGFloat = pin.top { arr.append(mLaySafe(.top, .equal, view, constant: value, priority: priority, file: file, line: line)) }
+        if let value: CGFloat = pin.leading { arr.append(mLaySafe(.leading, .equal, view, constant: value, priority: priority, file: file, line: line)) }
+        if let value: CGFloat = pin.bottom { arr.append(mLaySafe(.bottom, .equal, view, constant: -value, priority: priority, file: file, line: line)) }
+        if let value: CGFloat = pin.trailing { arr.append(mLaySafe(.trailing, .equal, view, constant: -value, priority: priority, file: file, line: line)) }
         return arr
     }
 }
@@ -461,8 +461,8 @@ public extension UIView {
     }
     
     @discardableResult
-    func mLayChain(pin: OptionalEdge, to view: UIView? = nil, file: String = #file, line: Int = #line) -> Self {
-        mLay(pin: pin, to: view, file: file, line: line)
+    func mLayChain(pin: OptionalEdge, to view: UIView? = nil, priority: UILayoutPriority = .required, file: String = #file, line: Int = #line) -> Self {
+        mLay(pin: pin, to: view, priority: priority, file: file, line: line)
         return self
     }
     
@@ -549,8 +549,8 @@ public extension UIView {
     }
     
     @discardableResult
-    func mLayChainSafe(pin: OptionalEdge, to view: UIView? = nil, file: String = #file, line: Int = #line) -> Self {
-        mLaySafe(pin: pin, to: view, file: file, line: line)
+    func mLayChainSafe(pin: OptionalEdge, to view: UIView? = nil, priority: UILayoutPriority = .required, file: String = #file, line: Int = #line) -> Self {
+        mLaySafe(pin: pin, to: view, priority: priority, file: file, line: line)
         return self
     }
 }
