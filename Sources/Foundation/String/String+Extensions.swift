@@ -21,4 +21,11 @@ public extension Optional where Wrapped == String {
             wrapped.withDefault(defaultValue)
         }
     }
+    
+    var isEmpty: Bool {
+        switch self {
+        case .none: true
+        case .some(let wrapped): wrapped.isEmpty
+        }
+    }
 }
