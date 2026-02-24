@@ -18,8 +18,7 @@ public struct Clamped<Value: Comparable> {
 
 public extension Comparable {
     func clamped(to range: ClosedRange<Self>) -> Self {
-        print(max(self, range.lowerBound))
-        return min(max(self, range.lowerBound), range.upperBound)
+        min(max(self, range.lowerBound), range.upperBound)
     }
 }
 
