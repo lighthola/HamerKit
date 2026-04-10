@@ -2,6 +2,7 @@ import UIKit
 
 public extension UIViewController {
     func add(child: UIViewController, to view: UIView? = nil) {
+        guard child.parent == nil else { return }
         let view: UIView = view ?? self.view
         addChild(child)
         view.addSubview(child.view)
@@ -19,6 +20,7 @@ public extension UIViewController {
 
 public extension UIViewController {
     func add(child: UIViewController, toStackView stackView: UIStackView) {
+        guard child.parent == nil else { return }
         addChild(child)
         stackView.addArrangedSubview(child.view)
         child.didMove(toParent: self)
