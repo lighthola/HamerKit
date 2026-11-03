@@ -9,7 +9,7 @@ public extension UIViewController {
             gradientView.direction = direction
             gradientView.locations = locations
         } else {
-            let gradientView = GradientView(colors: colors, direction: direction, loactions: locations)
+            let gradientView = GradientView(colors: colors, direction: direction, locations: locations)
             view.insertSubview(gradientView, at: 0)
             gradientView.mLayChain(pin: .zero)
         }
