@@ -201,22 +201,22 @@ public extension UIView {
     }
     
     @discardableResult
-    func mLayCenterXY(to view: UIView? = nil, file: String = #file, line: Int = #line) -> [NSLayoutConstraint] {
+    func mLayCenterXY(to view: UIView? = nil, priority: UILayoutPriority = .required, file: String = #file, line: Int = #line) -> [NSLayoutConstraint] {
         assert(view != nil || superview != nil, "can't add Constraint to nil , superview and parameter view is nil")
-        return [mLay(.centerY, .equal, view ?? superview!, file: file, line: line),
-                mLay(.centerX, .equal, view ?? superview!, file: file, line: line)]
+        return [mLay(.centerY, .equal, view ?? superview!, priority: priority, file: file, line: line),
+                mLay(.centerX, .equal, view ?? superview!, priority: priority, file: file, line: line)]
     }
-    
+
     @discardableResult
-    func mLayCenterX(to view: UIView? = nil, file: String = #file, line: Int = #line) -> NSLayoutConstraint {
+    func mLayCenterX(to view: UIView? = nil, priority: UILayoutPriority = .required, file: String = #file, line: Int = #line) -> NSLayoutConstraint {
         assert(view != nil || superview != nil, "can't add Constraint to nil , superview and parameter view is nil")
-        return mLay(.centerX, .equal, view ?? superview!, file: file, line: line)
+        return mLay(.centerX, .equal, view ?? superview!, priority: priority, file: file, line: line)
     }
-    
+
     @discardableResult
-    func mLayCenterY(to view: UIView? = nil, file: String = #file, line: Int = #line) -> NSLayoutConstraint {
+    func mLayCenterY(to view: UIView? = nil, priority: UILayoutPriority = .required, file: String = #file, line: Int = #line) -> NSLayoutConstraint {
         assert(view != nil || superview != nil, "can't add Constraint to nil , superview and parameter view is nil")
-        return mLay(.centerY, .equal, view ?? superview!, file: file, line: line)
+        return mLay(.centerY, .equal, view ?? superview!, priority: priority, file: file, line: line)
     }
     
     @discardableResult
@@ -341,9 +341,9 @@ public extension UIView {
         }
         
         constraint.constant = constant
-        constraint.active(bool: active)
-        constraint.identifier = file.components(separatedBy: "/").last! + ":\(line)"
         constraint.priority = priority
+        constraint.identifier = file.components(separatedBy: "/").last! + ":\(line)"
+        constraint.active(bool: active)
         return constraint
     }
     
@@ -357,6 +357,35 @@ public extension UIView {
         if let value: CGFloat = pin.bottom { arr.append(mLaySafe(.bottom, .equal, view, constant: -value, priority: priority, file: file, line: line)) }
         if let value: CGFloat = pin.trailing { arr.append(mLaySafe(.trailing, .equal, view, constant: -value, priority: priority, file: file, line: line)) }
         return arr
+    }
+
+    @discardableResult
+    func mLaySafeCenterXY(to view: UIView? = nil, priority: UILayoutPriority = .required, file: String = #file, line: Int = #line) -> [NSLayoutConstraint] {
+        assert(view != nil || superview != nil, "can't add Constraint to nil , superview and parameter view is nil")
+        return [mLaySafeCenterY(to: view, priority: priority, file: file, line: line),
+                mLaySafeCenterX(to: view, priority: priority, file: file, line: line)]
+    }
+
+    @discardableResult
+    func mLaySafeCenterX(to view: UIView? = nil, priority: UILayoutPriority = .required, file: String = #file, line: Int = #line) -> NSLayoutConstraint {
+        assert(view != nil || superview != nil, "can't add Constraint to nil , superview and parameter view is nil")
+        translatesAutoresizingMaskIntoConstraints = false
+        let constraint: NSLayoutConstraint = centerXAnchor.constraint(equalTo: (view ?? superview!).safeAreaLayoutGuide.centerXAnchor)
+        constraint.priority = priority
+        constraint.identifier = file.components(separatedBy: "/").last! + ":\(line)"
+        constraint.isActive = true
+        return constraint
+    }
+
+    @discardableResult
+    func mLaySafeCenterY(to view: UIView? = nil, priority: UILayoutPriority = .required, file: String = #file, line: Int = #line) -> NSLayoutConstraint {
+        assert(view != nil || superview != nil, "can't add Constraint to nil , superview and parameter view is nil")
+        translatesAutoresizingMaskIntoConstraints = false
+        let constraint: NSLayoutConstraint = centerYAnchor.constraint(equalTo: (view ?? superview!).safeAreaLayoutGuide.centerYAnchor)
+        constraint.priority = priority
+        constraint.identifier = file.components(separatedBy: "/").last! + ":\(line)"
+        constraint.isActive = true
+        return constraint
     }
 }
 
@@ -467,20 +496,20 @@ public extension UIView {
     }
     
     @discardableResult
-    func mLayChainCenterXY(to view: UIView? = nil, file: String = #file, line: Int = #line) -> Self {
-        mLayCenterXY(to: view, file: file, line: line)
+    func mLayChainCenterXY(to view: UIView? = nil, priority: UILayoutPriority = .required, file: String = #file, line: Int = #line) -> Self {
+        mLayCenterXY(to: view, priority: priority, file: file, line: line)
         return self
     }
-    
+
     @discardableResult
-    func mLayChainCenterX(to view: UIView? = nil, file: String = #file, line: Int = #line) -> Self {
-        mLayCenterX(to: view, file: file, line: line)
+    func mLayChainCenterX(to view: UIView? = nil, priority: UILayoutPriority = .required, file: String = #file, line: Int = #line) -> Self {
+        mLayCenterX(to: view, priority: priority, file: file, line: line)
         return self
     }
-    
+
     @discardableResult
-    func mLayChainCenterY(to view: UIView? = nil, file: String = #file, line: Int = #line) -> Self {
-        mLayCenterY(to: view, file: file, line: line)
+    func mLayChainCenterY(to view: UIView? = nil, priority: UILayoutPriority = .required, file: String = #file, line: Int = #line) -> Self {
+        mLayCenterY(to: view, priority: priority, file: file, line: line)
         return self
     }
     
@@ -551,6 +580,24 @@ public extension UIView {
     @discardableResult
     func mLayChainSafe(pin: OptionalEdge, to view: UIView? = nil, priority: UILayoutPriority = .required, file: String = #file, line: Int = #line) -> Self {
         mLaySafe(pin: pin, to: view, priority: priority, file: file, line: line)
+        return self
+    }
+
+    @discardableResult
+    func mLayChainSafeCenterXY(to view: UIView? = nil, priority: UILayoutPriority = .required, file: String = #file, line: Int = #line) -> Self {
+        mLaySafeCenterXY(to: view, priority: priority, file: file, line: line)
+        return self
+    }
+
+    @discardableResult
+    func mLayChainSafeCenterX(to view: UIView? = nil, priority: UILayoutPriority = .required, file: String = #file, line: Int = #line) -> Self {
+        mLaySafeCenterX(to: view, priority: priority, file: file, line: line)
+        return self
+    }
+
+    @discardableResult
+    func mLayChainSafeCenterY(to view: UIView? = nil, priority: UILayoutPriority = .required, file: String = #file, line: Int = #line) -> Self {
+        mLaySafeCenterY(to: view, priority: priority, file: file, line: line)
         return self
     }
 }
