@@ -171,6 +171,22 @@ public extension UIView {
         mLay(attribute, relatedBy, toItem, attribute1, multiplier: 1, constant: constant, active: active, priority: priority, file: file, line: line)
     }
     
+    /// 以 `UILayoutGuide`（例如 `view.safeAreaLayoutGuide` 或自訂 guide）為對象建立約束。
+    @discardableResult
+    func mLay(_ attribute: NSLayoutConstraint.Attribute,
+              _ relatedBy: NSLayoutConstraint.Relation,
+              _ toGuide: UILayoutGuide,
+              _ attribute1: NSLayoutConstraint.Attribute,
+              multiplier: CGFloat = 1,
+              constant: CGFloat = 0,
+              active: Bool = true,
+              priority: UILayoutPriority = .required,
+              file: String = #file,
+              line: Int = #line) -> NSLayoutConstraint {
+        translatesAutoresizingMaskIntoConstraints = false
+        return makeLayoutConstraint(item: self, attribute, relatedBy, toGuide, attribute1, multiplier: multiplier, constant: constant, active: active, priority: priority, file: file, line: line)
+    }
+
     @discardableResult
     func mLay(pin: UIEdgeInsets, to view: UIView? = nil, file: String = #file, line: Int = #line) -> [NSLayoutConstraint] {
         assert(view != nil || superview != nil, "can't add Constraint to nil , superview and parameter view is nil")
@@ -477,6 +493,22 @@ public extension UIView {
         return self
     }
     
+    /// 以 `UILayoutGuide`（例如 `view.safeAreaLayoutGuide` 或自訂 guide）為對象建立約束。
+    @discardableResult
+    func mLayChain(_ attribute: NSLayoutConstraint.Attribute,
+                   _ relatedBy: NSLayoutConstraint.Relation,
+                   _ toGuide: UILayoutGuide,
+                   _ attribute1: NSLayoutConstraint.Attribute,
+                   multiplier: CGFloat = 1,
+                   constant: CGFloat = 0,
+                   active: Bool = true,
+                   priority: UILayoutPriority = .required,
+                   file: String = #file,
+                   line: Int = #line) -> Self {
+        mLay(attribute, relatedBy, toGuide, attribute1, multiplier: multiplier, constant: constant, active: active, priority: priority, file: file, line: line)
+        return self
+    }
+
     @discardableResult
     func mLayChain(pin: UIEdgeInsets, to view: UIView? = nil, file: String = #file, line: Int = #line) -> Self {
         mLay(pin: pin, to: view, file: file, line: line)
@@ -600,4 +632,93 @@ public extension UIView {
         mLaySafeCenterY(to: view, priority: priority, file: file, line: line)
         return self
     }
+}
+
+// MARK: - UILayoutGuide
+
+/// 自訂 `UILayoutGuide` 當約束主體時使用；guide 需先 `addLayoutGuide` 加到 view，再建立約束。
+public extension UILayoutGuide {
+    @discardableResult
+    func mLay(_ attribute: NSLayoutConstraint.Attribute,
+              _ relatedBy: NSLayoutConstraint.Relation,
+              _ toItem: UIView?,
+              _ attribute1: NSLayoutConstraint.Attribute,
+              multiplier: CGFloat = 1,
+              constant: CGFloat = 0,
+              active: Bool = true,
+              priority: UILayoutPriority = .required,
+              file: String = #file,
+              line: Int = #line) -> NSLayoutConstraint {
+        makeLayoutConstraint(item: self, attribute, relatedBy, toItem, attribute1, multiplier: multiplier, constant: constant, active: active, priority: priority, file: file, line: line)
+    }
+
+    @discardableResult
+    func mLay(_ attribute: NSLayoutConstraint.Attribute,
+              _ relatedBy: NSLayoutConstraint.Relation,
+              _ toGuide: UILayoutGuide,
+              _ attribute1: NSLayoutConstraint.Attribute,
+              multiplier: CGFloat = 1,
+              constant: CGFloat = 0,
+              active: Bool = true,
+              priority: UILayoutPriority = .required,
+              file: String = #file,
+              line: Int = #line) -> NSLayoutConstraint {
+        makeLayoutConstraint(item: self, attribute, relatedBy, toGuide, attribute1, multiplier: multiplier, constant: constant, active: active, priority: priority, file: file, line: line)
+    }
+
+    @discardableResult
+    func mLayChain(_ attribute: NSLayoutConstraint.Attribute,
+                   _ relatedBy: NSLayoutConstraint.Relation,
+                   _ toItem: UIView?,
+                   _ attribute1: NSLayoutConstraint.Attribute,
+                   multiplier: CGFloat = 1,
+                   constant: CGFloat = 0,
+                   active: Bool = true,
+                   priority: UILayoutPriority = .required,
+                   file: String = #file,
+                   line: Int = #line) -> Self {
+        mLay(attribute, relatedBy, toItem, attribute1, multiplier: multiplier, constant: constant, active: active, priority: priority, file: file, line: line)
+        return self
+    }
+
+    @discardableResult
+    func mLayChain(_ attribute: NSLayoutConstraint.Attribute,
+                   _ relatedBy: NSLayoutConstraint.Relation,
+                   _ toGuide: UILayoutGuide,
+                   _ attribute1: NSLayoutConstraint.Attribute,
+                   multiplier: CGFloat = 1,
+                   constant: CGFloat = 0,
+                   active: Bool = true,
+                   priority: UILayoutPriority = .required,
+                   file: String = #file,
+                   line: Int = #line) -> Self {
+        mLay(attribute, relatedBy, toGuide, attribute1, multiplier: multiplier, constant: constant, active: active, priority: priority, file: file, line: line)
+        return self
+    }
+}
+
+/// `UIView`／`UILayoutGuide` 共用的約束建立流程（`identifier` 為「檔名:行號」，與 `mLay` 一致）。
+@MainActor
+private func makeLayoutConstraint(item: Any,
+                                  _ attribute: NSLayoutConstraint.Attribute,
+                                  _ relatedBy: NSLayoutConstraint.Relation,
+                                  _ toItem: Any?,
+                                  _ attribute1: NSLayoutConstraint.Attribute,
+                                  multiplier: CGFloat,
+                                  constant: CGFloat,
+                                  active: Bool,
+                                  priority: UILayoutPriority,
+                                  file: String,
+                                  line: Int) -> NSLayoutConstraint {
+    let constraint = NSLayoutConstraint(item: item,
+                                        attribute: attribute,
+                                        relatedBy: relatedBy,
+                                        toItem: toItem,
+                                        attribute: attribute1,
+                                        multiplier: multiplier,
+                                        constant: constant)
+    constraint.priority = priority
+    constraint.isActive = active
+    constraint.identifier = file.components(separatedBy: "/").last! + ":\(line)"
+    return constraint
 }
