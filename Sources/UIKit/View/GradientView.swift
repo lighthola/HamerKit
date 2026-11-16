@@ -22,7 +22,7 @@ public extension GradientView {
     }
 }
 
-public class GradientView: UIView {
+open class GradientView: UIView {
     public var colors: [UIColor] {
         didSet {
             updateLayer()
@@ -41,31 +41,33 @@ public class GradientView: UIView {
         }
     }
     
-    public var gradientLayer: CAGradientLayer { layer as! CAGradientLayer }
+    private var gradientLayer: CAGradientLayer { layer as! CAGradientLayer }
     
     public override class var layerClass: AnyClass { CAGradientLayer.self }
     
     // MARK: Init
     
-    public init(colors: [UIColor], direction: Direction = .horizontal, loactions: [NSNumber] = [0, 1]) {
+    public init(colors: [UIColor], direction: Direction = .horizontal, locations: [NSNumber] = [0, 1]) {
         self.colors = colors
         self.direction = direction
-        self.locations = loactions
+        self.locations = locations
         super.init(frame: .zero)
+        updateLayer()
     }
     
     public override init(frame: CGRect = .zero) {
-        self.colors = [.red, .green]
+        self.colors = []
         self.direction = .horizontal
         self.locations = [0, 1]
         super.init(frame: frame)
         updateLayer()
     }
     
-    required init?(coder: NSCoder) { fatalError() }
-    
-    public override func layoutSubviews() {
-        super.layoutSubviews()
+    public required init?(coder: NSCoder) {
+        self.colors = []
+        self.direction = .horizontal
+        self.locations = [0, 1]
+        super.init(coder: coder)
         updateLayer()
     }
     
